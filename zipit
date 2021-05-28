@@ -1,0 +1,9 @@
+#! /bin/zsh
+
+cd $MERMAID/iris/data/
+for float in *; do
+
+    tar rvf mermaid.tar $float/archive/*/mseed/*mseed
+    tar rvf mermaid.tar $float/archive/*/meta/*geo_DET.csv
+
+done
