@@ -9,7 +9,7 @@ function verify_mseed2sac(iris_path)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 27-Aug-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% NB, this script only checks the equality of SAC header variables filled by
 %% mseed2sac.m.  It does not compare, e.g. `KUSER?`, because those fields are
@@ -24,6 +24,11 @@ defval('iris_path', fullfile(getenv('MERMAID'), 'iris'))
 % Glob may require furture update with new station names
 data_path = fullfile(iris_path, 'data');
 float_dirs = skipdotdir(dir(fullfile(data_path, 'P00*')));
+
+global_max_B = 0;
+global_max_B_sac = '';
+global_max_E = 0;
+global_max_E_sac = '';
 
 for i = 1:length(float_dirs)
     float_path = fullfile(float_dirs(i).folder, float_dirs(i).name);
@@ -114,7 +119,7 @@ for i = 1:length(float_dirs)
 
 
     % Compare data, and SAC header field-by-field.
-    cf_line{length(s1_sac)} = '';
+    cf_line = cell(length(s1_sac), 1);
     max_B = 0;
     max_B_sac = '';
     max_E = 0;
@@ -156,9 +161,24 @@ for i = 1:length(float_dirs)
     % Clean converted SAC files.
     delete('*SAC')
 
-    % Conclude with printouts
+    % Conclude with per float printouts
     fprintf('Largest starttime discrepancy: %.6f s (%s)\n', max_B, strippath(max_B_sac))
-    fprintf('Largest endtime discrepancy: %.6f s (%s)\n', max_E, strippath(max_E_sac))
+    fprintf('Largest endtime discrepancy:   %.6f s (%s)\n', max_E, strippath(max_E_sac))
     fprintf('Wrote %s\n\n', filename)
 
+    if max_B > global_max_B
+        global_max_B = max_B;
+        global_max_B_sac = max_B_sac;
+
+    end
+    if max_E > global_max_E
+        global_max_E = max_E;
+        global_max_E_sac = max_E_sac;
+
+    end
 end
+
+% Conclude with printout of max diffs considering all floats.
+fprintf('Considering all floats --\n')
+fprintf('Largest starttime discrepancy: %.6f s (%s)\n', global_max_B, strippath(global_max_B_sac))
+fprintf('Largest endtime discrepancy:   %.6f s (%s)\n', global_max_E, strippath(global_max_E_sac))
