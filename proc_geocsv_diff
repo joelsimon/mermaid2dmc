@@ -1,0 +1,37 @@
+#! /bin/zsh
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 27-Aug-2021, Darwin Kernel Version 18.7.0
+
+
+proc_dir=$MERMAID/processed/
+iris_dir=$MERMAID/iris/data/
+
+for float_dir in $( ls -d $proc_dir*/ ) ; do
+
+    # processed dir
+    proc_csv=$float_dir/geo_DET.csv
+    file $proc_csv
+
+    # 452.020-P-06 --> P0006
+    basename_float_dir=$( basename $float_dir )
+    split_name=("${(@s/-/)basename_float_dir}")
+    len_kstnm=$( echo -n $split_name[2]$split_name[3] | wc -m )
+    len_zeropad=$(( 5 - len_kstnm ))
+    zeros=$( printf '0%.0s' {1..$len_zeropad} )
+    kstnm=$split_name[2]$zeros$split_name[3]
+
+    # IRIS dir
+    iris_archives=$iris_dir/$kstnm/archive/
+    most_recent=$( ls -1 $iris_archives | tail -1 )
+    iris_csv=$iris_archives/$most_recent/meta/${most_recent}-geo_DET.csv
+
+    cd $iris_dir/$kstnm/logs/
+    cut -f2,3,4,5,6,7,8,8,10,11,13,14,15,16,17 -d, $proc_csv > proc_geo_DET.csv
+    cut -f2,3,4,5,6,7,8,8,10,11,13,14,15,16,17 -d, $iris_csv > iris_geo_DET.csv
+
+    diff proc_geo_DET.csv iris_geo_DET.csv > geo_DET-csv.diff
+
+
+done
