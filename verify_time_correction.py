@@ -2,7 +2,7 @@
 #
 # Author: Joel D. Simon (JDS)
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified by JDS: 26-Mar-2021
+# Last modified by JDS: 27-Aug-2021
 # Last tested: Python 2.7.15, Darwin-18.7.0-x86_64-i386-64bit
 
 import os
@@ -93,9 +93,9 @@ def time_correction_isequal(mseed_filename, geoscv_correction, automaid_metadata
         # 1. The mseed time correction is in units of 1/10,000 s (1e-4 s)
         # 2. It is encoded as an integer; i.e., it cannot encode fractional units
         # 3. Therefore, the smallest time difference it can encode is 1/10,000 s (1e-4 s)
-        # 4. QED (w/in precision)
-        if abs(geocsv_correction - mseed_time_corr_secs) > 0.0001 \
-        or abs(automaid_metadata_correction - mseed_time_corr_secs) > 0.0001:
+        # 4. QED* (w/in precision, see note at bottom)
+        if abs(geocsv_correction - mseed_time_corr_secs) >= 0.0002 \
+           or abs(automaid_metadata_correction - mseed_time_corr_secs) >= 0.0002:
             return False
 
         # Advance file pointer to next record
@@ -161,3 +161,31 @@ if not fail_list:
 else:
     for fail in fail_list:
         print("!!! Failure: " + fail)
+
+
+# Why we allow 0.0002 and not 0.0001 for comparison --
+#
+# Example: '20210424T002358.06_60861874.MER.DET.WLT5'
+#
+# The raw float passed around and used in algorithm, in s:
+#   In : e.obspy_trace_stats.sac['user3']
+#   Out: -0.08689990453064578
+#
+# That float in 0.0001 s:
+#   In : e.obspy_trace_stats.sac['user3']*10000
+#   Out: -868.9990453064578
+#
+# That float in 0.0001 s, cast to int (what is written to mseed header):
+#   In : np.int(e.obspy_trace_stats.sac['user3']*10000)
+#   Out: -868
+#   ==> TRUNCATED
+#
+# That float in s, cast to float32 (what is written in meta files/SAC header):
+#   In : '{:>13.6f}'.format(np.float32(e.obspy_trace_stats.sac['user3']))
+#   Out: '    -0.086900'
+#   ==> ROUNDED
+#
+# The difference between truncated and rounded in forms is 0.0001.
+# The nominal sampling frequency to date has been 0.05 seconds.
+# Therefore, this difference is 500x smaller than a single sampling interval.
+# This amount of slop is acceptable, and is practically encoded in the miniSEED format.
