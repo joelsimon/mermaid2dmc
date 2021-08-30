@@ -2,7 +2,7 @@
 #
 # Author: Joel D. Simon (JDS)
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified by JDS: 26-Mar-2021
+# Last modified by JDS: 30-Aug-2021
 # Last tested: Python 2.7.15, Darwin-18.7.0-x86_64-i386-64bit
 
 import os
@@ -151,3 +151,5 @@ for proc_dir in proc_dirs:
     with open(del_sac_txt, 'w') as del_sac_f:
         for line in del_sac_basename_list:
             del_sac_f.write(line + '\n')
+
+    print "Copied " + proc_dir
