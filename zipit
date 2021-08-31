@@ -1,13 +1,17 @@
 #! /bin/zsh
 #
-# Create tarball of miniSEED and GeoCSV files from most recent archive
+# Create tarball of miniSEED and GeoCSV files from most recent archive.
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 02-Aug-2021, Darwin Kernel Version 18.7.0
+# Last modified: 30-Aug-2021, Darwin Kernel Version 18.7.0
 
 cd $MERMAID/iris/data/
-for float in P0*; do
+for float in $( ls -1d */ ); do
+
+    # We don't need to verify that the last archive of float X is the same as
+    # float Y because we name the tarball after the archive...if there are
+    # multiple last-archive dates there will be multiple tarballs.
 
     last_archive=$( ls $float/archive | tail -1 )
     last_archive_date=$( echo $last_archive | cut -c 7- )
