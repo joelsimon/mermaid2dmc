@@ -1,0 +1,18 @@
+#! /bin/zsh
+#
+# Recursively fetch MERMAID metadata (GeoCSV) from
+# http://ds.iris.edu/data/reports/MH/ and save to ~/Downloads.
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 31-Aug-2021, Darwin Kernel Version 18.7.0
+
+cd ~/Downloads
+wget --recursive \
+     --no-host-directories\
+     --no-parent \
+     --cut-dirs=3 \
+     --reject="index.html*","*robots*" \
+     http://ds.iris.edu/data/reports/MH/
+
+echo "Saved to ~/Downloads"
