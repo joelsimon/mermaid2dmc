@@ -1,0 +1,44 @@
+#! /bin/zsh
+#
+# Generate diff comparing mseed2sac metadata file in the second-to-last and most
+# recent archive, and print lines that changed between old ('<') and new ('>').
+#
+# If nothing changed, and the file was only appended to, the only lines that are
+# printed (beginning with '<') should be header/comment lines.
+#
+# Removes first column (which contains automaid version and thus generate diffs
+# for every line with every new version) before performing diff.
+#
+# Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 28-Aug-2021, Darwin Kernel Version 18.7.0
+
+clear
+iris_dir=$MERMAID/iris/data/
+
+for float_dir in $( ls -d $iris_dir*/ ) ; do
+
+    cd $float_dir
+
+    back2=$( ls -1 archive | tail -2 | head -1 )
+    back1=$( ls -1 archive | tail -1 )
+
+    back2_csv=archive/$back2/meta/${back2}-mseed2sac_metadata_DET.csv
+    back1_csv=archive/$back1/meta/${back1}-mseed2sac_metadata_DET.csv
+
+    # Remove the first column only
+    cut -f2,3,4,5,6,7,8,8,10,11,12,13,14,15,16,17 -d, $back2_csv > logs/back2.csv
+    cut -f2,3,4,5,6,7,8,8,10,11,12,13,14,15,16,17 -d, $back1_csv > logs/back1.csv
+
+    bn_back2=$( basename $back2_csv )
+    bn_back1=$( basename $back1_csv )
+    diff_name=${bn_back1}_${bn_back1}_mseed2sac_metadata_DET-csv.diff
+    diff logs/back2.csv logs/back1.csv > logs/$diff_name
+
+    rm logs/back2.csv logs/back1.csv
+
+    printf 'Lines in %s that differ in %s:\n' $bn_back2 $bn_back1
+    grep "<" logs/$diff_name
+    printf '\n'
+
+done
