@@ -1,0 +1,35 @@
+#! /bin/zsh
+#
+#   Usage: mermaid2dmc <archive_date>
+# Example: mermaid2dmc 2021-11-29T19:02:07Z
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 30-Nov-2021, Darwin Kernel Version 18.7.0
+
+# Parse input requested archive
+archive=$1
+
+# miniseed2dmc script location plus host and port
+# (latter two assigned by IRIS and to be remain masked)
+miniseed2dmc=/Users/joelsimon/programs/miniseed2dmc/miniseed2dmc
+host=$MINISEED2DMC_HOST
+port=$MINISEED2DMC_PORT
+
+# Parent dir of float subdirs and log file
+iris_dir=$MERMAID/iris/data/
+station_dirs=$( ls -d1 $iris_dir/*/ )
+mermaid2dmc_log=$iris_dir/mermaid2dmc.log
+echo "Archive: $archive" >> $mermaid2dmc_log
+
+# Loop over every float sudbir and transmit mseeds; write state/syncfile locally
+for station_dir in $( echo $station_dirs ); do
+    station=$( basename $( echo $station_dir ))
+    archive_dir=$iris_dir/$station/archive/$station:$archive/
+    mseed_dir=$archive_dir/mseed/
+
+    $miniseed2dmc $host:$port -p -v -w $archive_dir $mseed_dir >> $mermaid2dmc_log
+    
+done
+echo "" >> $mermaid2dmc_log
+
