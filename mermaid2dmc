@@ -1,11 +1,10 @@
 #! /bin/zsh
 #
-#   Usage: mermaid2dmc <archive_date>
-# Example: mermaid2dmc 2021-11-29T19:02:07Z
+# Usage: mermaid2dmc <archive_date>
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 30-Nov-2021, Darwin Kernel Version 18.7.0
+# Last modified: 01-Dec-2021, Springdale Linux 7.4 (Verona)
 
 # Parse input requested archive
 archive=$1
