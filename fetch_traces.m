@@ -27,7 +27,7 @@ for i = 1:length(st)
     end
 end
 
-fid = fopen('~/Desktop/IRIS_traces.txt', 'w+');
+fid = fopen(fullfile(getenv('MERMAID'), 'iris', 'data', 'fetch_traces.txt'), 'w+');
 fprintf(fid, 'station #traces            oldest_trace            newest_trace\n');
 names = fieldnames(tr);
 for i = 1:length(names)
