@@ -1,0 +1,56 @@
+#! /bin/zsh
+#
+# Compares number of .mseed in all/, sum of .mseed in archive/* (recursive), and
+# number of "Algorithm" rows in most recent GeoCSV to verify that every file
+# transmitted to IRIS has an associated metadata row in GeoCSV.
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 14-Jan-2022, Darwin Kernel Version 18.7.0
+
+clear
+
+# Check counts for each float transmitted to IRIS
+iris_dir=$MERMAID/iris/data/
+for float_dir in $( ls -d $iris_dir*/ ) ; do
+
+    # Get current float directory and identify most recent archive
+    kstnm=$( basename $float_dir)
+    all_dir=$iris_dir/$kstnm/all
+    archive_dir=$iris_dir/$kstnm/archive
+    most_recent=$( ls -1 $archive_dir | tail -1 )
+    last_archive=$archive_dir/$most_recent
+
+    # Count number of miniSEED in all/ and (recursively) in  archive/*
+    archive_count=$( find $archive_dir -name "*.mseed" | wc -l )
+    all_count=$( find $all_dir -name "*.mseed" | wc -l )
+
+    # Count number of "Algorithm" rows in GeoCSV
+    geocsv=$last_archive/meta/${most_recent}-geo_DET.csv
+    num_algo_rows=$( grep "Algorithm" $geocsv | wc -l)
+
+    # Print some summary statements
+    printf "MERMAID: %s\n" $kstnm
+    printf "All (.mseed): %s [%i]\n" $all_dir $all_count
+    printf "Archive (.mseed): %s [%i]\n" $archive_dir $archive_count
+    printf "GeoCSV ('Algorithm' rows): %s [%i]\n" $geocsv $num_algo_rows
+
+    # Exit upon error
+    if [[ archive_count -ne all_count ]]; then
+	echo "Fail: sum of .mseed in archive/ does not equal .mseed in all/"
+	return 1
+
+    fi
+
+    if [[ num_algo_rows -ne all_count ]]; then
+	echo "Fail: number of GeoCSV 'Algorithm' rows does not equal .mseed in archive/"
+	return 2
+
+    fi
+
+    printf "Pass\n\n"
+
+done
+
+printf "All tests passed\n"
+return 0
