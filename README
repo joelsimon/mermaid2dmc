@@ -1,0 +1,15 @@
+$ conda activate pymaid
+
+$ python cp_data.py
+
+$ python verify_time_correction.py
+
+$ verify_geocsv_algo_rows
+
+$ verify_geocsv_diff
+
+>> verify_mseed2sac
+
+$ zipit_geocsv
+
+$ mermaid2dmc <last_archive>
