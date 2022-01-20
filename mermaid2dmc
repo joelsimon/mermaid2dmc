@@ -28,8 +28,9 @@ for station_dir in $( echo $station_dirs ); do
     station=$( basename $( echo $station_dir ))
     archive_dir=$iris_dir/$station/archive/$station:$archive/
     mseed_dir=$archive_dir/mseed/
-
     echo "\nAttempting to transmit: $mseed_dir"  >> $mermaid2dmc_log
+
+    # Add "-p" before "$host" to do pretend mode (like git -n, --dry-run)
     $miniseed2dmc $host:$port -v -w $archive_dir $mseed_dir >> $mermaid2dmc_log
 
 done
