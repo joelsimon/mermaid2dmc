@@ -1,10 +1,12 @@
 #! /bin/zsh
 #
+# DEPRECIATED: use `mermaid2dmc` to transfer .mseed to IRIS.
+#
 # Create tarball of miniSEED and GeoCSV files from most recent archive.
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 30-Aug-2021, Darwin Kernel Version 18.7.0
+# Last modified: 20-Jan-2022, Darwin Kernel Version 18.7.0
 
 cd $MERMAID/iris/data/
 for float in $( ls -1d */ ); do
