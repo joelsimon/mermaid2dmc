@@ -4,7 +4,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 01-Dec-2021, Springdale Linux 7.4 (Verona)
+# Last modified: 25-Feb-2022, Springdale Linux 7.4 (Verona)
 
 # Parse input requested archive
 archive=$1
@@ -31,7 +31,8 @@ for station_dir in $( echo $station_dirs ); do
     echo "\nAttempting to transmit: $mseed_dir"  >> $mermaid2dmc_log
 
     # Add "-p" before "$host" to do pretend mode (like git -n, --dry-run)
-    $miniseed2dmc $host:$port -v -w $archive_dir $mseed_dir >> $mermaid2dmc_log
+    $miniseed2dmc -p $host:$port -v -w $archive_dir $mseed_dir >> $mermaid2dmc_log
+    #$miniseed2dmc $host:$port -v -w $archive_dir $mseed_dir >> $mermaid2dmc_log
 
 done
 echo "\n<! END TRANSFER !>\n" >> $mermaid2dmc_log
