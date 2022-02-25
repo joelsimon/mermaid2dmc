@@ -12,4 +12,5 @@ $ verify_geocsv_diff
 
 $ zipit_geocsv
 
+# ON FRISIUS ONLY!
 $ mermaid2dmc <last_archive>
