@@ -9,7 +9,7 @@ function verify_mseed2sac(iris_path)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 27-Aug-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 25-Feb-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% NB, this script only checks the equality of SAC header variables filled by
 %% mseed2sac.m.  It does not compare, e.g. `KUSER?`, because those fields are
@@ -182,3 +182,5 @@ end
 fprintf('Considering all floats --\n')
 fprintf('Largest starttime discrepancy: %.6f s (%s)\n', global_max_B, strippath(global_max_B_sac))
 fprintf('Largest endtime discrepancy:   %.6f s (%s)\n', global_max_E, strippath(global_max_E_sac))
+
+cd(iris_path)

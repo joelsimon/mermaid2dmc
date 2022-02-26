@@ -1,5 +1,12 @@
 # conda env: pymaid
 #
+# Generate archives of [.sac, GeoCSV, and] .mseed for `mermaid2dmc` transmission.
+#
+# (1) Delete and overwrite all data in, .e.g.
+#     .../P0008/all/[ mseed/ , sac/ , meta/ ]
+# (2) Generate new timestamped archive as, e.g.
+#     .../P0008/archive/<iso8601>/[ mseed/ , sac/ , meta/ ]
+#
 # Author: Joel D. Simon (JDS)
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 # Last modified by JDS: 30-Aug-2021
@@ -152,4 +159,4 @@ for proc_dir in proc_dirs:
         for line in del_sac_basename_list:
             del_sac_f.write(line + '\n')
 
-    print "Copied " + proc_dir
+    print "Archived: " + proc_dir

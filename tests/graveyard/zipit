@@ -1,6 +1,7 @@
 #! /bin/zsh
 #
 # DEPRECIATED: use `mermaid2dmc` to transfer .mseed to IRIS.
+# (before `mermaid2dmc` JSD emailed tarballs of .mseed + GeoCSV to IRIS)
 #
 # Create tarball of miniSEED and GeoCSV files from most recent archive.
 #
