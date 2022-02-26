@@ -1,6 +1,6 @@
 Package and transmit MERMAID miniSEED and GeoCSV for archival at the IRIS DMC.\
 Written by Joel D. Simon for EarthScope-Oceans.\
-Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com\
+Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 
 
 NB,\
@@ -39,7 +39,7 @@ https://github.com/earthscopeoceans/automaid)
 By default `mermaid2dmc` runs in "pretend mode"; turn it off when ready...
 After completion, check $MERMAID/iris/data/ermaid2dmc.log for errors
 
-[5] Tar new GeoCSV for posting on the MDA (email to Un Joe at IRIS)\
+[5] Tar new GeoCSV for posting on the MDA (email to IRIS DMC admin)\
     e.g., https://ds.iris.edu/data/reports/MH/P0008/archive/
 ```
     $ tar_geocsv
