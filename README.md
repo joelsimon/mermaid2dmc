@@ -36,7 +36,7 @@ https://github.com/earthscopeoceans/automaid)
    $ mermaid2dmc <new_archive>
    ```
 
-By default `mermaid2dmc` runs in "pretend mode"; turn it off when ready...
+By default `mermaid2dmc` runs in "pretend mode"; turn it off when ready...\
 After completion, check $MERMAID/iris/data/ermaid2dmc.log for errors
 
 [5] Tar new GeoCSV for posting on the MDA (email to IRIS DMC admin)\
