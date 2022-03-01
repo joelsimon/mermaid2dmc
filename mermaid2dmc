@@ -10,7 +10,7 @@
 archive=$1
 
 # miniseed2dmc script location plus host and port
-# (latter two assigned by IRIS and to be remain masked)
+# (latter two assigned by IRIS and to remain masked)
 miniseed2dmc=/home/jdsimon/github/miniseed2dmc/miniseed2dmc # frisius
 #miniseed2dmc=/Users/joelsimon/programs/miniseed2dmc/miniseed2dmc # mac
 host=$MINISEED2DMC_HOST
@@ -23,7 +23,7 @@ mermaid2dmc_log=$iris_dir/mermaid2dmc.log
 echo "<! BEGIN TRANSFER !>" >> $mermaid2dmc_log
 echo "Archive: $archive" >> $mermaid2dmc_log
 
-# Loop over every float sudbir and transmit mseeds; write state/syncfile locally
+# Loop over every float sudbir and transmit mseeds; write state, syncfile locally
 for station_dir in $( echo $station_dirs ); do
     station=$( basename $( echo $station_dir ))
     archive_dir=$iris_dir/$station/archive/$station:$archive/
