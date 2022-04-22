@@ -7,8 +7,8 @@ NB,\
 `$ <command>` means execute in terminal\
 `>> <command>` means execute in MATLAB
 
-[0] Activate `conda` env from automaid (see
-https://github.com/earthscopeoceans/automaid)
+[0] Activate `conda` env from automaid
+(see https://github.com/earthscopeoceans/automaid)
 ```
     $ conda activate pymaid
 ```
@@ -37,7 +37,7 @@ https://github.com/earthscopeoceans/automaid)
    ```
 
 By default `mermaid2dmc` runs in "pretend mode"; turn it off when ready...\
-After completion, check $MERMAID/iris/data/ermaid2dmc.log for errors
+After completion, check $MERMAID/iris/data/mermaid2dmc.log for errors
 
 [5] Tar new GeoCSV for posting on the MDA (email to IRIS DMC admin)\
     e.g., https://ds.iris.edu/data/reports/MH/P0008/archive/
