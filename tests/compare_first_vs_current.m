@@ -3,7 +3,9 @@ function cf = compare_first_vs_current
 %
 % Compares SAC files in the first archive 2021-05-28T16:42:41Z with the current
 % "all" running list to ensure that only the SAC headers SCALE and KUSER0
-% (automaid version) differ.
+% (automaid version) differ.  Only compares 1:1 SAC file list from 2021-05-28
+% (2672 files); obviously there is no "first" comparison against which to
+% compare for the newer files (which will have later version numbers).
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
@@ -24,7 +26,10 @@ s_old = fullsac([], merdir, [], '2021-05-28');
 % sent to IRIS.
 s_new = fullsac([], merdir, [], 'all');
 
-% The expectation: only the SCALE will have updated (from 170177 to -149400).
+% The expectation:
+% *only the SCALE will have updated (from 170177 to -149400).
+% *only KUSER0 (automaid version number) will change (from v3.4.0-Z to v3.4.4)
+%  [`git log v3.4.0-Z^..v3.4.4` to see those diffs; nothing major]
 [~, idx_old, idx_new] = intersect(strippath(s_old), strippath(s_new));
 
 if length(s_old) ~= length(idx_new)

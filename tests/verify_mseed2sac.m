@@ -21,7 +21,7 @@ clc
 % Default.
 defval('iris_path', fullfile(getenv('MERMAID'), 'iris'))
 
-% Glob may require furture update with new station names
+% Glob may require future update with new station names.
 data_path = fullfile(iris_path, 'data');
 float_dirs = skipdotdir(dir(fullfile(data_path, 'P00*')));
 
