@@ -5,7 +5,7 @@
 # .diff file showing their differences.  If you just copied from processed then
 # the only difference should be date of creation and new lines.
 #
-# The utitity of this script is questionable...I initially created it to see how
+# The utility of this script is questionable...I initially created it to see how
 # dev branches in automaid modified an archive already transmitted to IRIS.
 #
 # Author: Joel D. Simon
