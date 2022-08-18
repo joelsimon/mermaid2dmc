@@ -46,4 +46,5 @@ After completion, check $MERMAID/iris/data/mermaid2dmc.log for errors
 ```
 
 [6] # Check data availability (give IRIS a few days to archive)\
-https://service.iris.edu/fdsnws/availability/1/query?format=text&net=MH&sta=*&loc=*&cha=*&starttime=2000-01-01T00:00:00&endtime=2059-12-23T59:59:99&orderby=nslc_time_quality_samplerate&includerestricted=true&nodata=404
+https://service.iris.edu/fdsnws/availability/1/query?format=text&net=MH&sta=*&loc=*&cha=*&starttime=2000-01-01T00:00:00&endtime=2059-12-23T59:59:99&orderby=nslc_time_quality_samplerate&includerestricted=true&nodata=404\
+(NB, toggle `includerestricted=true/false` to track release of embargoed data)
