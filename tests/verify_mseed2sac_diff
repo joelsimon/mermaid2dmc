@@ -28,7 +28,7 @@ for float_dir in $( ls -d $iris_dir*/ ) ; do
     diff_name=${bn_back2}_${bn_back1}.diff
     diff $back2_csv $back1_csv >! logs/$diff_name
 
-    printf ' Old lines ("<") in %s that have changed\n(new lines (">") in %s not shown; new appended data):\n' $bn_back2 $bn_back1
+    printf 'Lines in %s that changed in %s:\n' $bn_back2 $bn_back1
     grep --no-filename "<" logs/$diff_name
     printf '\n'
 
