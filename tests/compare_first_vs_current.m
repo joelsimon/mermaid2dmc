@@ -7,6 +7,11 @@ function cf = compare_first_vs_current
 % (2672 files); obviously there is no "first" comparison against which to
 % compare for the newer files (which will have later version numbers).
 %
+% Does not find any diffs with five P0006 SAC files (updated with archive
+% 2022-08-17T22:21:22Z; STLO was incorrect due to crossing antimeridian and bug
+% in automaid v3.5.0, fixed in v3.5.1) because I did not archive P0006 data in
+% the first 2021-05-28T16:42:41Z archive (so there is nothing to compare).
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 30-Aug-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
