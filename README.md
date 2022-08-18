@@ -25,7 +25,7 @@ NB,\
     $ python tests/verify_time_correction.py
     $ tests/verify_geocsv_algo_rows
     $ tests/verify_geocsv_diff
-    $ tests/mseed2sac_diff
+    $ tests/verify_mseed2sac_diff
     >> cd tests; compare_first_vs_current;
     >> verify_mseed2sac
 ```
