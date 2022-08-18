@@ -9,11 +9,10 @@
 # Removes first column (which contains automaid version and thus generate diffs
 # for every line with every new version) before performing diff.
 #
-# Joel D. Simon
+# Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 27-Aug-2021, Darwin Kernel Version 18.7.0
+# Last modified: 18-Aug-2022, Darwin Kernel Version 18.7.0
 
-clear
 iris_dir=$MERMAID/iris/data/
 
 for float_dir in $( ls -d $iris_dir*/ ) ; do
@@ -27,18 +26,17 @@ for float_dir in $( ls -d $iris_dir*/ ) ; do
     back1_csv=archive/$back1/meta/${back1}-geo_DET.csv
 
     # Remove the first column only
-    cut -f2,3,4,5,6,7,8,8,10,11,12,13,14,15,16,17 -d, $back2_csv > logs/back2.csv
-    cut -f2,3,4,5,6,7,8,8,10,11,12,13,14,15,16,17 -d, $back1_csv > logs/back1.csv
+    cut_back2=$( cut -f2- -d, $back2_csv )
+    cut_back1=$( cut -f2- -d, $back1_csv )
 
     bn_back2=$( basename $back2_csv )
     bn_back1=$( basename $back1_csv )
-    diff_name=${bn_back1}_${bn_back1}_geo_DET-csv.diff
-    diff logs/back2.csv logs/back1.csv > logs/$diff_name
 
-    rm logs/back2.csv logs/back1.csv
+    diff_name=${bn_back2}_${bn_back1}.diff
+    diff <( echo $cut_back2 ) <( echo $cut_back1 ) > logs/$diff_name
 
-    printf 'Lines in %s that differ in %s:\n' $bn_back2 $bn_back1
-    grep "<" logs/$diff_name
+    printf 'Lines in %s that changed in %s:\n' $bn_back2 $bn_back1
+    grep --no-filename "<" logs/$diff_name
     printf '\n'
 
 done
