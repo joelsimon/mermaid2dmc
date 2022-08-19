@@ -1,9 +1,11 @@
 function tr = fetch_traces
 % TR = FETCH_TRACES
 %
+% Print tally of all MERMAID traces currently (publicly) available from IRIS DMC.
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 19-Nov-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 19-Aug-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 network = 'MH';
 station = '*';
@@ -27,7 +29,21 @@ for i = 1:length(st)
     end
 end
 
-fid = fopen(fullfile(getenv('MERMAID'), 'iris', 'data', 'fetch_traces.txt'), 'w+');
+irisdir = fullfile(getenv('MERMAID'), 'iris');
+fetchdir = fullfile(irisdir, 'fetch');
+if exist(fetchdir, 'dir') ~= 7
+    success = mkdir(fetchdir);
+    if success
+        fprintf('Made new directory: %s\n', fetchdir)
+
+    else
+         error('Unable to make new directory: %s', fetchdir)
+
+    end
+end
+
+fname = fullfile(fetchdir, 'fetch_traces.txt');
+fid = fopen(fname, 'w+');
 fprintf(fid, 'station #traces            oldest_trace            newest_trace\n');
 names = fieldnames(tr);
 for i = 1:length(names)
@@ -39,3 +55,5 @@ for i = 1:length(names)
     fprintf(fid, '  %5s    %4i    %s    %s\n', mermaid, num_traces, oldest, newest);
 
 end
+fclose(fid);
+fprintf('Wrote %s\n', fname)
