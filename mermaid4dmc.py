@@ -23,7 +23,6 @@ proc_dirs = sorted(glob.glob(os.path.join(mer_dir, 'processed', '452*')))
 iris_data_dir = os.path.join(mer_dir, 'iris', 'data')
 
 for proc_dir in proc_dirs:
-
     # Convert, e.g., ".../452.020-P-08/" to ".../P0008/"
     # (lifted from `dives.attach_kstnm_kinst`)
     station_name = proc_dir.split('/')[-1]
@@ -82,7 +81,7 @@ for proc_dir in proc_dirs:
 
     ## _______________________________________________________________________ ##
     ## (2) .../<float_name>/archive/<iso8601>/
-    ## _______________________________________________________________________ #
+    ## _______________________________________________________________________ ##
 
     archive_dir = os.path.join(kstnm_dir, 'archive')
     if not os.path.exists(archive_dir):
