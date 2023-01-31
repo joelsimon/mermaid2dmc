@@ -1,11 +1,23 @@
-function tr = fetch_traces
-% TR = FETCH_TRACES
+function fetch_traces(uname, passwd)
+% FETCH_TRACES(uname, passwd)
 %
-% Print tally of all MERMAID traces currently (publicly) available from IRIS DMC.
+% Fetch open and restricted MERMAID data sets from IRIS.
+%
+% Input:
+% uname     IRIS username for embargoed data
+%               (def: 'jdsimon@alumni.princeton.edu')
+% passwd    IRIS password for embargoed data
+%               (def: getenv('IRIS_AUTH_PASSWD'))
+%
+% Output:
+% Writes trace lists to $MERMAID/iris/fetch/
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 24-Aug-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 31-Jan-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+defval('uname', 'jdsimon@alumni.princeton.edu')
+defval('passwd', getenv('IRIS_AUTH_PASSWD'))
 
 network = 'MH';
 station = '*';
@@ -13,7 +25,7 @@ location = '*';
 channel = '*';
 startDate = '1970-01-01 00:00:00';
 endDate = datestr(datetime('now'));
-unamepwd = {'jdsimon@alumni.princeton.edu', getenv('IRIS_AUTH_PASSWD')};
+unamepwd = {uname, passwd};
 
 restriction = {'open', 'partial'};
 for k = 1:length(restriction)
@@ -33,7 +45,7 @@ for k = 1:length(restriction)
                                             unamepwd);
 
           otherwise
-            error('Choose only ''open'' or ''partial'' for restrictoin status')
+            error('Choose only ''open'' or ''partial'' for restriction status')
 
         end
 
@@ -74,4 +86,5 @@ for k = 1:length(restriction)
     end
     fclose(fid);
     fprintf('Wrote %s\n', fname)
+
 end
