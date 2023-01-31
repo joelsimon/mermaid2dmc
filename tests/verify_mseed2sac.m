@@ -4,6 +4,21 @@ function verify_mseed2sac(iris_path)
 % Compares SAC files written directly by automaid with SAC files originally
 % written as mseed and converted to SAC with "mseed2sac.m -m mseed2sac_metadata*.csv"
 %
+% !! These .sac trigger a diff due to v3.5.1 longitude fix (see $MERMAID/iris/misc/notes)
+% !! These .sac will forever trigger until (if I ever...) change `mermaid4dmc.py` to overwrite /all/*.sac
+% !! It does not currently do that because EVERY update would trigger an overwrite of .sac due to h.KUSER0
+% !! Maybe it should do that, and instead .mseed diffs should be relied upon to catch relevant changes...
+%
+% [mac] /Users/joelsimon/mermaid/iris/data (* master)
+% $ grep "+" **/*mseed2sac_diffs.txt
+% P0006/logs/mseed2sac_diffs.txt:20190107T063153.06_5C38811A.MER.DET.WLT5.sac, MH.P0006.00.BDH.D.2019.007.063153.SAC -- STLO: +1, E: -5
+% P0006/logs/mseed2sac_diffs.txt:20190107T075038.06_5C38811A.MER.DET.WLT5.sac, MH.P0006.00.BDH.D.2019.007.075038.SAC -- STLO: +1
+% P0006/logs/mseed2sac_diffs.txt:20190107T105254.06_5C38811A.MER.DET.WLT5.sac, MH.P0006.00.BDH.D.2019.007.105254.SAC -- STLO: +1
+% P0006/logs/mseed2sac_diffs.txt:20190110T161524.06_5C38811A.MER.DET.WLT5.sac, MH.P0006.00.BDH.D.2019.010.161524.SAC -- STLO: +1
+% P0006/logs/mseed2sac_diffs.txt:20190111T055842.06_5C38811A.MER.DET.WLT5.sac, MH.P0006.00.BDH.D.2019.011.055842.SAC -- STLO: +1, E: -5
+% P0009/logs/mseed2sac_diffs.txt:20220607T202827.09_62A41F12.MER.DET.WLT5.sac, MH.P0009.00.BDH.D.2022.158.202827.SAC -- STLO: +2
+% P0009/logs/mseed2sac_diffs.txt:20220610T231052.09_62A41F12.MER.DET.WLT5.sac, MH.P0009.00.BDH.D.2022.161.231052.SAC -- STLO: +1
+%
 % Input:
 % irispath        Path to IRIS directory (def: $MERMAID/iris)
 %
