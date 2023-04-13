@@ -14,7 +14,7 @@ function fetch_traces(uname, passwd)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 31-Jan-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 13-Apr-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('uname', 'jdsimon@alumni.princeton.edu')
 defval('passwd', getenv('IRIS_AUTH_PASSWD'))
@@ -36,10 +36,12 @@ for k = 1:length(restriction)
 
         switch restriction{k}
           case 'open'
+            fprintf('Fetching open-restriction %s traces\n', station)
             tr.(station) = irisFetch.Traces(network, station, location, ...
                                             channel, startDate, endDate);
 
           case 'partial'
+            fprintf('Fetching partial-restriction %s traces\n', station)
             tr.(station) = irisFetch.Traces(network, station, location, ...
                                             channel, startDate, endDate, ...
                                             unamepwd);
@@ -84,6 +86,7 @@ for k = 1:length(restriction)
         fprintf(fid, '  %5s    %4i    %s    %s\n', mermaid, num_traces, oldest, newest);
 
     end
+
     fclose(fid);
     fprintf('Wrote %s\n', fname)
 
