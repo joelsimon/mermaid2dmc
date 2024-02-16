@@ -8,8 +8,11 @@
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 # Last modified: 16-Feb-2024, Darwin Kernel Version 18.7.0
 
-if [ "$OSTYPE"  = 'linux' ]; then
-    echo "Only works on Mac"
+# Bizarre --
+# $OSTYPE: in terminal returns "linux"
+# $OSTYPE: in script returns "linux-gnu"
+if [[ $OSTYPE =~ "linux" ]]; then
+    echo "only works on Mac"
     return 1
 
 fi
