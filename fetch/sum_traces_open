@@ -1,0 +1,4 @@
+#! /bin/zsh
+
+file=$MERMAID/iris/fetch/fetch_traces_open.txt
+awk '{ sum += $2 } END{ print sum }' <( sed '1d' $file )
