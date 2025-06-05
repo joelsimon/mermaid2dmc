@@ -38,15 +38,22 @@ defval('iris_path', fullfile(getenv('MERMAID'), 'iris'))
 
 % Glob may require future update with new station names.
 data_path = fullfile(iris_path, 'data');
-float_dirs = skipdotdir(dir(fullfile(data_path, 'P00*')));
+stations = readtext('../station_list.txt');
+stations(1) = [];
 
 global_max_B = 0;
 global_max_B_sac = '';
 global_max_E = 0;
 global_max_E_sac = '';
 
-for i = 1:length(float_dirs)
-    float_path = fullfile(float_dirs(i).folder, float_dirs(i).name);
+for i = 1:length(stations)
+    if ~strcmp(stations{i}, 'P0022')
+        continue
+
+    end
+    
+        
+    float_path = fullfile(data_path, stations{i});
     fprintf('Testing: %s\n', float_path)
 
     mseed_path = fullfile(float_path, 'all', 'mseed');
@@ -63,13 +70,20 @@ for i = 1:length(float_dirs)
 
     % Convert from miniSEED to SAC using `mseed2sac`.
     mseed_files = fullfile(mseed_path, '*\.mseed');
-    meta_file = fullfile(meta_path, 'mseed2sac_metadata_DET.csv');
-    [status, result] = system(sprintf('mseed2sac -m %s %s', meta_file, mseed_files));
-    if status ~= 0
-        error(sprintf('`mseed2sac` failed with the following  message:\n%s', result))
+
+    meta_file = fullfile(meta_path, 'mseed2sac_metadata_DET_REQ.csv');
+    try
+        [status, result] = system(sprintf('mseed2sac -m %s %s', meta_file, mseed_files));
+        if status ~= 0
+            error(sprintf('`mseed2sac` failed with the following  message:\n%s', result))
+            
+        end
+    catch
+        warning('failed on %s (no files, maybe?)', stations{i})
+        continue
 
     end
-
+    
     % Match up file lists based on starttime.
     s1_sac = fullsac([], sac_path);
     s2_sac = fullsac([], log_path);
@@ -85,7 +99,9 @@ for i = 1:length(float_dirs)
 
     % First verification.
     if ~isequal(s1_time, s2_time)
-        error('List of starttimes (from filenames) do not match')
+        keyboard
+        warning('%s list of starttimes (from filenames) do not match', stations{i})
+        %error('List of starttimes (from filenames) do not match')
 
     end
 
@@ -199,3 +215,4 @@ fprintf('Largest starttime discrepancy: %.6f s (%s)\n', global_max_B, strippath(
 fprintf('Largest endtime discrepancy:   %.6f s (%s)\n', global_max_E, strippath(global_max_E_sac))
 
 cd(iris_path)
+

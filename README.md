@@ -10,7 +10,9 @@ NB,\
 [0] Activate `conda` env from automaid
 (see https://github.com/earthscopeoceans/automaid)
 ```
-    $ conda activate pymaid
+    $ conda activate pymaid3.10 # automaid > v4
+    - OR - 
+    $ conda activate pymaid # automaid <= v3
 ```
 
 [1] Generate new MERMAID archive for transmission to IRIS DMC
@@ -18,6 +20,12 @@ NB,\
 ```
     $ python mermaid4dmc.py
 ```
+
+>>>>>>>>>>>>>>>>>>>>>>>>> NOT RELEVANT SINCE AUTOMAID 4+ <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+The diffs these check for go haywire because:
+(1) almost every time/location changed slightly with automaid v4
+(2) for most floats there is no previous archive to compare against
 
 [2] Run various tests and verifications\
 (check logs, git diffs etc. in $MERMAID/iris/data)
@@ -30,11 +38,13 @@ NB,\
     >> verify_mseed2sac
 ```
 
+>>>>>>>>>>>>>>>>>>>>>>>>> NOT RELEVANT SINCE AUTOMAID 4+ <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<,
+
 [3] Transmit miniSEED in new archive via IRIS' `miniseed2dmc` protocol\
 (only works on JDS' frisius; other users must contact IRIS admin for "host:port")
 ```
    $ mermaid2dmc <new_archive>
-   ```
+ ```
 
 By default `mermaid2dmc` runs in "pretend mode"; turn it off when ready...\
 After completion, check $MERMAID/iris/data/mermaid2dmc.log for errors

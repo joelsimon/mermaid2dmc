@@ -6,7 +6,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 16-Feb-2024, Darwin Kernel Version 18.7.0
+# Last modified: 05-Jun-2025, Darwin Kernel Version 23.6.0
 
 # Bizarre --
 # $OSTYPE: in terminal returns "linux"
@@ -18,11 +18,10 @@ if [[ $OSTYPE =~ "linux" ]]; then
 fi
 
 cd $MERMAID/iris/data/
-for float in P0*; do
-
+station_list=$MERMAID/iris/scripts/station_list.txt
+for float in $( tail -n +2 $station_list ); do
     last_archive=$( ls $float/archive | tail -1 )
     last_archive_date=$( echo $last_archive | cut -c 7- )
-
-    tar rvf ${last_archive_date}.tar $float/archive/$last_archive/meta/*geo_DET.csv
+    tar rvf ${last_archive_date}.tar $float/archive/$last_archive/meta/*geo_DET_REQ.csv
 
 done

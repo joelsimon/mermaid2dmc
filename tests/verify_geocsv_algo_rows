@@ -1,5 +1,8 @@
 #! /bin/zsh
 #
+#
+# !! Obsolete -- number of DET rows is checked in verify_time_correction.py !!
+#
 # Compares number of .mseed in all/, sum of .mseed in archive/* (recursive), and
 # number of "Algorithm" rows in most recent GeoCSV to verify that every file
 # transmitted to IRIS has an associated metadata row in GeoCSV.

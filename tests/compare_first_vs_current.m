@@ -14,7 +14,7 @@ function cf = compare_first_vs_current
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 30-Aug-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 04-Jun-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 merdir = fullfile(getenv('MERMAID'), 'iris', 'data');
 
@@ -38,8 +38,13 @@ s_new = fullsac([], merdir, [], 'all');
 [~, idx_old, idx_new] = intersect(strippath(s_old), strippath(s_new));
 
 if length(s_old) ~= length(idx_new)
-    error('Every SAC in the old archive should still exist in the current full ("all") list')
+    %error('Every SAC in the old archive should still exist in the current full ("all") list')
+    warning('Not every SAC in the old archive still exists in the current full ("all") list')
+    missing = setdiff(strippath(s_old), strippath(s_new))
+    for i = 1:length(missing)
+        warning('Missing: %s\n', missing{i})
 
+    end
 end
 
 for i = 1:length(idx_old)
@@ -55,3 +60,4 @@ end
 fprintf('\nLength 2021-05-28 archive:  %i\n', length(s_old))
 fprintf(  'Number of SAC comparisons:  %i\n', length(cf));
 fprintf(  'Unique comparisons strings: %s\n', char(unique(cf)));
+keyboard

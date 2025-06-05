@@ -21,6 +21,7 @@ for float_dir in $( ls -d $iris_dir*/ ) ; do
 
     back2_csv=archive/$back2/meta/${back2}-mseed2sac_metadata_DET.csv
     back1_csv=archive/$back1/meta/${back1}-mseed2sac_metadata_DET.csv
+    #back1_csv=archive/$back1/meta/${back1}-mseed2sac_metadata_DET_REQ.csv
 
     bn_back2=$( basename $back2_csv )
     bn_back1=$( basename $back1_csv )

@@ -7,10 +7,10 @@
 # (2) Generate new timestamped archive as, e.g.
 #     .../P0008/archive/<iso8601>/[ mseed/ , sac/ , meta/ ]
 #
-# Author: Joel D. Simon (JDS)
-# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified by JDS: 30-Aug-2021
-# Last tested: Python 2.7.15, Darwin-18.7.0-x86_64-i386-64bit
+# Developer: Joel D. Simon (JDS)
+# Contact: jdsimon@alumni.princeton.edu
+# Last modified: 05-Jun-2025
+# Last tested: Python Python 3.10.15, Darwin Kernel Version 23.6.0
 
 import os
 import csv
@@ -19,16 +19,39 @@ import shutil
 
 # Define directories (globs may need to be changed new stations)
 mer_dir = os.environ['MERMAID']
-proc_dirs = sorted(glob.glob(os.path.join(mer_dir, 'processed', '452*')))
 iris_data_dir = os.path.join(mer_dir, 'iris', 'data')
+
+## >>
+# Princeton/French only
+# proc_dirs = sorted(glob.glob(os.path.join(mer_dir, 'processed', '452*')))
+
+# Finally, everyone
+# Get list of station names (KSTNM) we actually want to transmit
+with open('station_list.txt', 'r') as f:
+    next(f) # skip header
+    kstnm_to_send = [line.strip() for line in f]
+
+# Get list of all processed subdirs (individual stations, in OSEAN serial-number
+# formatting); check if we actually want to transmit this station after kstnm
+# conversion in loop below
+parent = os.path.join(mer_dir, 'processed_everyone')
+proc_dirs = sorted([os.path.join(parent, d) for d in os.listdir(parent)
+                    if os.path.isdir(os.path.join(parent, d))
+                    and not os.path.basename(d).startswith('.')])
+## <<
 
 for proc_dir in proc_dirs:
     # Convert, e.g., ".../452.020-P-08/" to ".../P0008/"
-    # (lifted from `dives.attach_kstnm_kinst`)
+    # (lifted from `dives.attach_kstnm_kinst)
     station_name = proc_dir.split('/')[-1]
     kinst, kstnm_char, kstnm_num = station_name.split('-')
     num_zeros = 5 - len(kstnm_char + kstnm_num)
     kstnm = kstnm_char + '0'*num_zeros + kstnm_num
+
+    # Only archive/transmit to IRIS stations on the ESO website
+    if kstnm not in kstnm_to_send:
+        print(f"Skipping: {kstnm}")
+        continue
 
     # I want to do two things:
     # (1) Delete and overwrite all data in, .e.g.
@@ -61,21 +84,21 @@ for proc_dir in proc_dirs:
         os.mkdir(subdir)
 
     # Copy all SAC files
-    current_sac_list = sorted(glob.glob(os.path.join(proc_dir, "**/*DET*sac")))
+    current_sac_list = sorted(glob.glob(os.path.join(proc_dir, "**/*.sac")))
     current_sac_list = [x for x in current_sac_list if 'prelim' not in x]
     for sac in current_sac_list:
         shutil.copy(sac, all_sac_dir)
 
     # Copy all miniSEED files
-    current_mseed_list = sorted(glob.glob(os.path.join(proc_dir, "**/*DET*mseed")))
+    current_mseed_list = sorted(glob.glob(os.path.join(proc_dir, "**/*.mseed")))
     current_mseed_list = [x for x in current_mseed_list if 'prelim' not in x]
     for mseed_file in current_mseed_list:
         shutil.copy(mseed_file, all_mseed_dir)
 
     # Copy requisite metadata files
-    meta_list = [os.path.join(proc_dir, 'geo_DET.csv')]
-    meta_list.append(os.path.join(proc_dir, 'mseed2sac_metadata_DET.csv'))
-    meta_list.append(os.path.join(proc_dir, 'automaid_metadata_DET.csv'))
+    meta_list = [os.path.join(proc_dir, 'geo_DET_REQ.csv')]
+    meta_list.append(os.path.join(proc_dir, 'mseed2sac_metadata_DET_REQ.csv'))
+    meta_list.append(os.path.join(proc_dir, 'automaid_metadata_DET_REQ.csv'))
     for meta_file in meta_list:
         shutil.copy(meta_file, all_meta_dir)
 
@@ -87,8 +110,8 @@ for proc_dir in proc_dirs:
     if not os.path.exists(archive_dir):
         os.mkdir(archive_dir)
 
-    archived_mseed_list = glob.glob(os.path.join(archive_dir, "**/mseed/*DET*mseed"))
-    archived_sac_list = glob.glob(os.path.join(archive_dir, "**/sac/*DET*sac"))
+    archived_mseed_list = glob.glob(os.path.join(archive_dir, "**/mseed/*.mseed"))
+    archived_sac_list = glob.glob(os.path.join(archive_dir, "**/sac/*.sac"))
 
     # Extract GeoCSV creation date from file to generate this archive's date
     with open(meta_list[0], 'r') as geocsv_file:
@@ -97,6 +120,7 @@ for proc_dir in proc_dirs:
             if "created" in line:
                 created_str = line
                 break
+
     last_created_date = created_str.split("#created: ")[-1].strip('\n')
     archive_str = "{}:{}".format(kstnm, last_created_date)
     current_archive_dir = os.path.join(archive_dir, archive_str)
@@ -112,15 +136,14 @@ for proc_dir in proc_dirs:
 
     # Determine which files have not previously been archived, and
     # which files were previously archived and have since been deleted
-    current_mseed_basename_list = map(os.path.basename, current_mseed_list)
-    archived_mseed_basename_list = set(map(os.path.basename, archived_mseed_list))
+    current_mseed_basename_list = list(map(os.path.basename, current_mseed_list))
+    archived_mseed_basename_list = list(set(map(os.path.basename, archived_mseed_list)))
 
     new_mseed_basename_list = [x for x in current_mseed_basename_list if x not in archived_mseed_basename_list]
     del_mseed_basename_list = [x for x in archived_mseed_basename_list if x not in current_mseed_basename_list]
 
-
-    current_sac_basename_list = map(os.path.basename, current_sac_list)
-    archived_sac_basename_list = set(map(os.path.basename, archived_sac_list))
+    current_sac_basename_list = list(map(os.path.basename, current_sac_list))
+    archived_sac_basename_list = list(set(map(os.path.basename, archived_sac_list)))
 
     new_sac_basename_list = [x for x in current_sac_basename_list if x not in archived_sac_basename_list]
     del_sac_basename_list = [x for x in archived_sac_basename_list if x not in current_sac_basename_list]
@@ -158,4 +181,4 @@ for proc_dir in proc_dirs:
         for line in del_sac_basename_list:
             del_sac_f.write(line + '\n')
 
-    print "Archived: " + proc_dir
+    print(f"Archived: {proc_dir}")

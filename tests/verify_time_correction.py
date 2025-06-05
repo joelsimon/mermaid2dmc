@@ -1,9 +1,12 @@
 # conda env: pymaid
 #
-# Author: Joel D. Simon (JDS)
-# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified by JDS: 27-Aug-2021
-# Last tested: Python 2.7.15, Darwin-18.7.0-x86_64-i386-64bit
+# Only checks DET files -- REQ files can be redundant (multiple mseed)
+# represented by a single algo line in GeoCSV.
+#
+# Developer: Joel D. Simon (JDS)
+# Contact: jdsimon@alumni.princeton.edu
+# Last modified: 04-Jun-2025
+# Last tested: Python Python 3.10.15, Darwin Kernel Version 23.6.0
 
 import os
 import csv
@@ -15,20 +18,20 @@ from obspy.io.mseed import util as obspy_util
 ## Function prototypes
 ## ___________________________________________________________________________ ##
 
-def get_mseed_filenames(mseed_dir):
+def get_DET_mseed_filenames(mseed_dir):
     mseed_filenames = []
     for dirpath, _, filenames in os.walk(mseed_dir):
         for filename in filenames:
-            if filename.endswith('.mseed'):
+            if 'DET' in filename and filename.endswith('.mseed'):
                 mseed_filenames.append(os.path.join(dirpath, filename))
 
     return mseed_filenames
 
-def get_automaid_metadata_corrections(automaid_metadata_filename, fieldnames_row_num=2):
+def get_DET_automaid_metadata_corrections(automaid_metadata_filename, fieldnames_row_num=2):
     # Returns a { filename : correction } dict
     automaid_metadata_corrections = {}
 
-    with open(automaid_metadata_filename, 'rb') as meta_file:
+    with open(automaid_metadata_filename, 'r') as meta_file:
         # Skip all headers but the final, which spells out the fieldnames
         # (counting from 0)
         meta_file = islice(meta_file, fieldnames_row_num, None)
@@ -37,25 +40,26 @@ def get_automaid_metadata_corrections(automaid_metadata_filename, fieldnames_row
         reader = csv.DictReader(meta_file)
         for row in reader:
             filename = row["#filename"] + '.mseed'
-            correction = float(row["USER3"])
-            automaid_metadata_corrections[filename] = correction
+            if 'DET' in filename:
+                correction = float(row["USER3"])
+                automaid_metadata_corrections[filename] = correction
 
     return automaid_metadata_corrections
 
-def get_geocsv_corrections(geocsv_filename, fieldnames_row_num=7):
+def get_DET_geocsv_corrections(geocsv_filename, fieldnames_row_num=11):
     # Returns a simple list of "Time Corrections" for associated with every
     # "Algorithm" row in the GeoCSV
     geocsv_corrections = []
 
-    with open(geocsv_filename, 'rb') as meta_file:
+    with open(geocsv_filename, 'r') as meta_file:
         # Skip all headers but the final, which spells out the fieldnames
         # (counting from 0)
         meta_file = islice(meta_file, fieldnames_row_num, None)
 
-        # Read every "Algorithm" row and parse the relevant columns in dict
+        # Read DET every "Algorithm" row and parse the relevant columns in dict
         reader = csv.DictReader(meta_file)
         for row in reader:
-            if "Algorithm" in row["MethodIdentifier"]:
+            if "Algorithm" in row["MethodIdentifier"] and "D" in row["DataQuality"]:
                 correction = float(row["TimeCorrection"])
                 geocsv_corrections.append(correction)
 
@@ -107,8 +111,13 @@ def time_correction_isequal(mseed_filename, geoscv_correction, automaid_metadata
 ## ___________________________________________________________________________ ##
 
 # Globs may need updating with new station names
-iris_dir = os.path.join(os.environ['MERMAID'], 'iris')
-float_dirs = sorted(glob.glob(os.path.join(iris_dir, 'data', 'P00*')))
+iris_data_dir = os.path.join(os.environ['MERMAID'], 'iris', 'data')
+float_dirs = sorted([os.path.join(iris_data_dir, d)
+                     for d in os.listdir(iris_data_dir)
+                     if (os.path.isdir(os.path.join(iris_data_dir, d)))
+                     and not (d.startswith('.'))])
+
+tot_tested = 0
 fail_list = []
 for float_dir in float_dirs:
     print("\nTesting: {}".format(float_dir))
@@ -116,14 +125,14 @@ for float_dir in float_dirs:
     # Use the "all" directory, not any specific "archive" to check all time
     # corrections using newest metadata
     mseed_dir = os.path.join(float_dir, 'all', 'mseed')
-    mseed_filenames = get_mseed_filenames(mseed_dir)
+    mseed_filenames = get_DET_mseed_filenames(mseed_dir)
 
     metadata_dir = os.path.join(float_dir, 'all', 'meta')
-    geocsv_filename = os.path.join(metadata_dir, 'geo_DET.csv')
-    geocsv_corrections = get_geocsv_corrections(geocsv_filename)
+    geocsv_filename = os.path.join(metadata_dir, 'geo_DET_REQ.csv')
+    geocsv_corrections = get_DET_geocsv_corrections(geocsv_filename)
 
-    automaid_metadata_filename = os.path.join(metadata_dir, 'automaid_metadata_DET.csv')
-    automaid_metadata_corrections = get_automaid_metadata_corrections(automaid_metadata_filename)
+    automaid_metadata_filename = os.path.join(metadata_dir, 'automaid_metadata_DET_REQ.csv')
+    automaid_metadata_corrections = get_DET_automaid_metadata_corrections(automaid_metadata_filename)
 
     if len(geocsv_corrections) != len(mseed_filenames):
         raise ValueError("Failed: Number of GeoCSV 'Algorithm' rows does not equal number of mseed files")
@@ -154,13 +163,16 @@ for float_dir in float_dirs:
     print("Tested: " + str(test_count))
     print("Passed: " + str(pass_count))
     print("Failed: " + str(fail_count))
-
+    tot_tested += test_count
+    
+print(f"\nTested {tot_tested} DET files")
 if not fail_list:
-    print("\nDone: all tests passed\n")
+    print("All tests passed\n")
 
 else:
     for fail in fail_list:
         print("!!! Failure: " + fail)
+
 
 
 # Why we allow 0.0002 and not 0.0001 for comparison --

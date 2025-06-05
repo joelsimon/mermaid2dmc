@@ -24,6 +24,7 @@ for float_dir in $( ls -d $iris_dir*/ ) ; do
 
     back2_csv=archive/$back2/meta/${back2}-geo_DET.csv
     back1_csv=archive/$back1/meta/${back1}-geo_DET.csv
+    #back1_csv=archive/$back1/meta/${back1}-geo_DET_REQ.csv
 
     # Remove the first column only
     cut_back2=$( cut -f2- -d, $back2_csv )
