@@ -9,7 +9,7 @@
 #
 # Developer: Joel D. Simon (JDS)
 # Contact: jdsimon@alumni.princeton.edu
-# Last modified: 05-Jun-2025
+# Last modified: 09-Jun-2025
 # Last tested: Python Python 3.10.15, Darwin Kernel Version 23.6.0
 
 import os
@@ -85,13 +85,13 @@ for proc_dir in proc_dirs:
 
     # Copy all SAC files
     current_sac_list = sorted(glob.glob(os.path.join(proc_dir, "**/*.sac")))
-    current_sac_list = [x for x in current_sac_list if 'prelim' not in x]
+    current_sac_list = [x for x in current_sac_list if 'prelim' not in x and 'IcCycle' not in x]
     for sac in current_sac_list:
         shutil.copy(sac, all_sac_dir)
 
     # Copy all miniSEED files
     current_mseed_list = sorted(glob.glob(os.path.join(proc_dir, "**/*.mseed")))
-    current_mseed_list = [x for x in current_mseed_list if 'prelim' not in x]
+    current_mseed_list = [x for x in current_mseed_list if 'prelim' not in x and 'IcCycle' not in x]
     for mseed_file in current_mseed_list:
         shutil.copy(mseed_file, all_mseed_dir)
 
@@ -110,6 +110,7 @@ for proc_dir in proc_dirs:
     if not os.path.exists(archive_dir):
         os.mkdir(archive_dir)
 
+    # Glob all mseed and sac
     archived_mseed_list = glob.glob(os.path.join(archive_dir, "**/mseed/*.mseed"))
     archived_sac_list = glob.glob(os.path.join(archive_dir, "**/sac/*.sac"))
 
