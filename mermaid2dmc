@@ -11,8 +11,9 @@ archive=$1
 
 # miniseed2dmc script location plus host and port
 # (latter two assigned by IRIS and to remain masked)
-miniseed2dmc=/home/jdsimon/github/miniseed2dmc/miniseed2dmc # frisius
+#miniseed2dmc=/home/jdsimon/github/miniseed2dmc/miniseed2dmc # frisius
 #miniseed2dmc=/Users/joelsimon/programs/miniseed2dmc/miniseed2dmc # mac
+miniseed2dmc=/Users/jdsimon/programs/miniseed2dmc/miniseed2dmc # geo_mac
 host=$MINISEED2DMC_HOST
 port=$MINISEED2DMC_PORT
 
