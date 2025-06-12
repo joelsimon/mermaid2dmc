@@ -11,7 +11,7 @@ NB,\
 (see https://github.com/earthscopeoceans/automaid)
 ```
     $ conda activate pymaid3.10 # automaid > v4
-    - OR - 
+    - OR -
     $ conda activate pymaid # automaid <= v3
 ```
 
@@ -21,24 +21,24 @@ NB,\
     $ python mermaid4dmc.py
 ```
 
->>>>>>>>>>>>>>>>>>>>>>>>> NOT RELEVANT SINCE AUTOMAID 4+ <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-The diffs these check for go haywire because:
-(1) almost every time/location changed slightly with automaid v4
-(2) for most floats there is no previous archive to compare against
-
-[2] Run various tests and verifications\
-(check logs, git diffs etc. in $MERMAID/iris/data)
-```
-    $ python tests/verify_time_correction.py
-    $ tests/verify_geocsv_algo_rows
-    $ tests/verify_geocsv_diff
-    $ tests/verify_mseed2sac_diff
-    >> cd tests; compare_first_vs_current;
-    >> verify_mseed2sac
-```
-
->>>>>>>>>>>>>>>>>>>>>>>>> NOT RELEVANT SINCE AUTOMAID 4+ <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<,
+>> !! >>  NOT RELEVANT SINCE AUTOMAID 4+
+>>
+>> The diffs these check for go haywire because:
+>> (1) almost every time/location changed slightly with automaid v4
+>> (2) for most floats there is no previous archive to compare against
+>>
+>> [2] Run various tests and verifications\
+>> (check logs, git diffs etc. in $MERMAID/iris/data)
+>> ```
+>>     $ python tests/verify_time_correction.py
+>>     $ tests/verify_geocsv_algo_rows
+>>     $ tests/verify_geocsv_diff
+>>     $ tests/verify_mseed2sac_diff
+>>     >> cd tests; compare_first_vs_current;
+>>     >> verify_mseed2sac
+>> ```
+>>
+>> NOT RELEVANT SINCE AUTOMAID 4+ << !!
 
 [3] Transmit miniSEED in new archive via IRIS' `miniseed2dmc` protocol\
 (only works on JDS' frisius; other users must contact IRIS admin for "host:port")
