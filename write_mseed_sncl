@@ -1,0 +1,142 @@
+#! /bin/zsh
+#
+# Write `sncl.txt` into each station's `all/mseed/` directory by running
+# `mseedview` on every `.mseed` file in that directory.
+#
+# Output format:
+#   1. `mseedview -V` at the top of each `sncl.txt`
+#   2. For each miniSEED file, compare the channel id and sample rate across
+#      all `mseedview <file>` output lines
+#   3. Reduce each retained line to: filename, SNCL, Hz, time
+#   4. If those values match on every line, write only the first line
+#   4. If they do not match, write the entire output and prefix every line
+#      with "!<filename>, "
+#
+# Author: Joel D. Simon <jdsimon@bathymetrix.com>
+# Last modified: 19-Mar-2026, Darwin Kernel Version 23.6.0
+#
+# Codex reconstruction spec:
+# zsh script with `set -euo pipefail`; configurable top vars:
+# `data_dir="${MERMAID}/iris/data"` and `mseedview="${HOME}/programs/libmseed/example/mseedview"`.
+# Exit with message if `MERMAID` unset, `data_dir` missing, or `mseedview` not executable.
+# Loop over station dirs under `$MERMAID/iris/data`; read input from `<station>/all/mseed/*.mseed`
+# and write output file `<station>/all/meta/sncl.txt`; skip stations missing `all/mseed` or `all/meta`.
+# Start each `sncl.txt` with `mseedview -V`, redirecting both stdout and stderr into the file.
+# For each `.mseed`, run `mseedview <file>`; if all output lines share identical SNCL and Hz, write only
+# the first reduced line, else write all reduced lines and prefix each with `!`.
+# Reduced line format is CSV with spaces: `<filename>, <SNCL>, <HZ>, <time>`; strip `FDSN:`, drop fields
+# like `4096` and `993 samples`, keep the day-of-year suffix `(DDD)` in the time field.
+# Track and print final tallies: stations written, stations skipped, miniSEED files processed, flagged files.
+# If no `.mseed` files are found anywhere under `iris/data/*/all/mseed`, print failure message and exit nonzero.
+
+set -euo pipefail
+
+if [[ -z "${MERMAID:-}" ]]; then
+    echo "MERMAID is not set"
+    exit 1
+fi
+
+data_dir="${MERMAID}/iris/data"
+mseedview="${HOME}/programs/libmseed/example/mseedview"
+
+if [[ ! -d "$data_dir" ]]; then
+    echo "Data directory not found: $data_dir"
+    exit 1
+fi
+
+if [[ ! -x "$mseedview" ]]; then
+    echo "mseedview not found or not executable: $mseedview"
+    exit 1
+fi
+
+stations_written=0
+stations_skipped=0
+total_mseed_files=0
+flagged_mseed_files=0
+
+format_mseedview_line() {
+    local output_line="$1"
+
+    printf '%s\n' "$output_line" | awk -F', ' '
+        {
+            sncl = $1
+            sub(/^FDSN:/, "", sncl)
+            hz = $5
+            time = $6
+            sub(/ \([^)]*\)$/, "", time)
+            printf "%s, %s, %s", sncl, hz, time
+        }
+    '
+}
+
+for station_dir in "$data_dir"/*(/); do
+    mseed_dir="${station_dir}/all/mseed"
+    meta_dir="${station_dir}/all/meta"
+
+    if [[ ! -d "$mseed_dir" ]]; then
+        continue
+    fi
+
+    if [[ ! -d "$meta_dir" ]]; then
+        continue
+    fi
+
+    sncl_file="${meta_dir}/sncl.txt"
+    mseed_files=("$mseed_dir"/*.mseed(N))
+
+    if (( ${#mseed_files[@]} == 0 )); then
+        echo "Skipping empty mseed dir: $mseed_dir"
+        ((stations_skipped += 1))
+        continue
+    fi
+
+    echo "Writing: $sncl_file"
+    "$mseedview" -V > "$sncl_file" 2>&1
+
+    for mseed_file in $mseed_files; do
+        filename=$(basename "$mseed_file")
+        mseed_output=$("$mseedview" "$mseed_file")
+
+        if [[ -z "$mseed_output" ]]; then
+            continue
+        fi
+
+        output_lines=("${(@f)mseed_output}")
+        first_line="${output_lines[1]}"
+        first_key=$(printf '%s\n' "$first_line" | awk -F', ' '{print $1 "|" $5}')
+        mismatch=0
+
+        for output_line in "${output_lines[@]}"; do
+            current_key=$(printf '%s\n' "$output_line" | awk -F', ' '{print $1 "|" $5}')
+            if [[ "$current_key" != "$first_key" ]]; then
+                mismatch=1
+                break
+            fi
+        done
+
+        if (( mismatch == 0 )); then
+            formatted_line=$(format_mseedview_line "$first_line")
+            printf '%s, %s\n' "$filename" "$formatted_line" >> "$sncl_file"
+        else
+            ((flagged_mseed_files += 1))
+            for output_line in "${output_lines[@]}"; do
+                formatted_line=$(format_mseedview_line "$output_line")
+                printf '!%s, %s\n' "$filename" "$formatted_line" >> "$sncl_file"
+            done
+        fi
+    done
+
+    ((stations_written += 1))
+    ((total_mseed_files += ${#mseed_files[@]}))
+done
+
+if (( total_mseed_files == 0 )); then
+    echo "No miniSEED data found under: $data_dir/*/all/mseed"
+    exit 1
+fi
+
+echo "Completed write_mseed_sncl"
+echo "Stations written: $stations_written"
+echo "Stations skipped (empty mseed dirs): $stations_skipped"
+echo "miniSEED files processed: $total_mseed_files"
+echo "miniSEED files flagged: $flagged_mseed_files"
