@@ -14,13 +14,12 @@
 #
 # Author: Joel D. Simon <jdsimon@bathymetrix.com>
 # Last modified: 19-Mar-2026, Darwin Kernel Version 23.6.0
-#
+
 # Codex reconstruction spec:
 # zsh script with `set -euo pipefail`; configurable top vars:
-# `data_dir="${MERMAID}/iris/data"` and `mseedview="${HOME}/programs/libmseed/example/mseedview"`.
+# `data_mode`, `data_dir`, and `mseedview="${HOME}/programs/libmseed/example/mseedview"`.
 # Exit with message if `MERMAID` unset, `data_dir` missing, or `mseedview` not executable.
-# Loop over station dirs under `$MERMAID/iris/data`; read input from `<station>/all/mseed/*.mseed`
-# and write output file `<station>/all/meta/sncl.txt`; skip stations missing `all/mseed` or `all/meta`.
+# Support both `iris` mode and `processed_everyone` mode.
 # Start each `sncl.txt` with `mseedview -V`, redirecting both stdout and stderr into the file.
 # For each `.mseed`, run `mseedview <file>`; if all output lines share identical SNCL and Hz, write only
 # the first reduced line, else write all reduced lines and prefix each with `!`.
@@ -36,8 +35,27 @@ if [[ -z "${MERMAID:-}" ]]; then
     exit 1
 fi
 
-data_dir="${MERMAID}/iris/data"
+# Set `data_mode` to:
+#   iris               -> read from $MERMAID/iris/data/<station>/all/mseed
+#                         and write to $MERMAID/iris/data/<station>/all/meta/sncl.txt
+#   processed          -> read from $MERMAID/processed_everyone/<station>/*/*.mseed
+#                         and write to $MERMAID/processed_everyone/<station>/sncl.txt
+#data_mode="iris"
+data_mode="processed"
 mseedview="${HOME}/programs/libmseed/example/mseedview"
+
+case "$data_mode" in
+    iris)
+        data_dir="${MERMAID}/iris/data"
+        ;;
+    processed)
+        data_dir="${MERMAID}/processed_everyone"
+        ;;
+    *)
+        echo "Unknown data_mode: $data_mode"
+        exit 1
+        ;;
+esac
 
 if [[ ! -d "$data_dir" ]]; then
     echo "Data directory not found: $data_dir"
@@ -70,22 +88,32 @@ format_mseedview_line() {
 }
 
 for station_dir in "$data_dir"/*(/); do
-    mseed_dir="${station_dir}/all/mseed"
-    meta_dir="${station_dir}/all/meta"
+    case "$data_mode" in
+        iris)
+            mseed_dir="${station_dir}/all/mseed"
+            meta_dir="${station_dir}/all/meta"
 
-    if [[ ! -d "$mseed_dir" ]]; then
-        continue
-    fi
+            if [[ ! -d "$mseed_dir" ]]; then
+                continue
+            fi
 
-    if [[ ! -d "$meta_dir" ]]; then
-        continue
-    fi
+            if [[ ! -d "$meta_dir" ]]; then
+                continue
+            fi
 
-    sncl_file="${meta_dir}/sncl.txt"
-    mseed_files=("$mseed_dir"/*.mseed(N))
+            sncl_file="${meta_dir}/sncl.txt"
+            mseed_files=("$mseed_dir"/*.mseed(N))
+            skip_label="$mseed_dir"
+            ;;
+        processed)
+            sncl_file="${station_dir}/sncl.txt"
+            mseed_files=("$station_dir"/*/*.mseed(N))
+            skip_label="$station_dir"
+            ;;
+    esac
 
     if (( ${#mseed_files[@]} == 0 )); then
-        echo "Skipping empty mseed dir: $mseed_dir"
+        echo "Skipping empty mseed source: $skip_label"
         ((stations_skipped += 1))
         continue
     fi
@@ -131,7 +159,14 @@ for station_dir in "$data_dir"/*(/); do
 done
 
 if (( total_mseed_files == 0 )); then
-    echo "No miniSEED data found under: $data_dir/*/all/mseed"
+    case "$data_mode" in
+        iris)
+            echo "No miniSEED data found under: $data_dir/*/all/mseed"
+            ;;
+        processed)
+            echo "No miniSEED data found under: $data_dir/*/*/*.mseed"
+            ;;
+    esac
     exit 1
 fi
 
